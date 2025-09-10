@@ -19,6 +19,7 @@ export const MovieDetails = () => {
         `${API_BASE_URL}/movie/${movieId}`,
         API_DATA
       );
+      
       setMovie(data);
     } catch (error) {
       console.log(error);
@@ -73,6 +74,7 @@ export const MovieDetails = () => {
             <p className="text-white">{movie.overview}</p>
           </div>
         </div>
+        <ul></ul>
       </section>
     )
   );

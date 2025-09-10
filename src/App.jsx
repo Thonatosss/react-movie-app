@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import Search from "./components/Search";
 import { HashLoader } from "react-spinners";
@@ -19,16 +19,19 @@ function App() {
   const [error, setError] = useState(null);
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const sentinelRef = useRef(null);
 
-  const fetchPopularMovies = async () => {
+  const fetchPopularMovies = async (pageNum = 1) => {
     setIsLoading(true);
     setError("");
-    const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
+    const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&page=${pageNum}`;
 
     try {
       const { data } = await axios.get(endpoint, API_DATA);
-      setMovies(data.results);
-      console.log(data.results);
+      setMovies((prev) => [...prev, ...data.results]);
+      setPage(pageNum);
     } catch (err) {
       const message =
         err.response?.data?.status_message ||
@@ -40,10 +43,51 @@ function App() {
       setIsLoading(false);
     }
   };
+  const handleSearch = async () => {
+    if (!search.trim()) return;
+    setIsLoading(true);
+    setError("");
+    let endpoint = `${API_BASE_URL}/search/movie?query=${search}`;
+    try {
+      const { data } = await axios.get(endpoint, API_DATA);
+      setMovies(data.results);
+    } catch (err) {
+      const message =
+        err.response?.data?.status_message ||
+        err.message ||
+        "Failed to fetch movies.";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
-    fetchPopularMovies();
+    fetchPopularMovies(1);
   }, []);
-
+  useEffect(() => {
+    if (!search) {
+      fetchPopularMovies();
+      return;
+    }
+    const delay = setTimeout(() => {
+      handleSearch();
+    }, 500);
+    return () => clearTimeout(delay);
+  }, [search]);
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !isLoading) {
+          fetchPopularMovies(page + 1);
+        }
+      },
+      { root: null, rootMargin: "400px", threshold: 0 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, page]);
   return (
     <main>
       <div className="patttern"></div>
@@ -71,6 +115,7 @@ function App() {
           )}
         </section>
       </div>
+      {hasMore && <div ref={sentinelRef} style={{ height: 1 }} />}
     </main>
   );
 }
