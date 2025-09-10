@@ -3,6 +3,7 @@ import "./App.css";
 import Search from "./components/Search";
 import { HashLoader } from "react-spinners";
 import MovieCard from "./components/MovieCard";
+import axios from "axios";
 
 const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -19,31 +20,28 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchMovies = async () => {
+  const fetchPopularMovies = async () => {
     setIsLoading(true);
     setError("");
-    try {
-      const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
-      const response = await fetch(endpoint, API_DATA);
-      if (!response.ok) throw new Error("Failed to fetch movies!");
-      const data = await response.json();
+    const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc`;
 
-      if (data.Response === "False") {
-        setError(data.Error || "Failed to fetch movies");
-        setMovies([]);
-        return;
-      }
-      setMovies(data.results || []);
-    } catch (error) {
-      console.log(error);
-      setError("Error fetching movies. Please try again later.");
+    try {
+      const { data } = await axios.get(endpoint, API_DATA);
+      setMovies(data.results);
+      console.log(data.results);
+    } catch (err) {
+      const message =
+        err.response?.data?.status_message ||
+        err.message ||
+        "Failed to fetch movies.";
+
+      setError(message);
     } finally {
       setIsLoading(false);
     }
   };
   useEffect(() => {
-    console.log(API_KEY);
-    fetchMovies();
+    fetchPopularMovies();
   }, []);
 
   return (
