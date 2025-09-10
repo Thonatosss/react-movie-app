@@ -12,7 +12,7 @@ function MovieCard({ movie }) {
   } = movie;
   return (
     <Link to={`/details/${id}`}>
-      <li className="movie-card text-white">
+      <li className="movie-card text-white transition-transform duration-150 ease-in hover:scale-105 ">
         <img
           src={
             poster_path
