@@ -27,11 +27,18 @@ function App() {
     setIsLoading(true);
     setError("");
     const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&page=${pageNum}`;
+    // const endpoint = `${API_BASE_URL}/movie/popular?page=${pageNum}`;
 
     try {
       const { data } = await axios.get(endpoint, API_DATA);
-      setMovies((prev) => [...prev, ...data.results]);
+      setMovies((prev) => {
+        const seen = new Set(prev.map((m) => m.id));
+        const next = data.results.filter((m) => !seen.has(m.id));
+        return [...prev, ...next];
+      });
+      setHasMore(pageNum < data.total_pages);
       setPage(pageNum);
+      console.log(movies);
     } catch (err) {
       const message =
         err.response?.data?.status_message ||
@@ -69,6 +76,7 @@ function App() {
       fetchPopularMovies();
       return;
     }
+
     const delay = setTimeout(() => {
       handleSearch();
     }, 500);
@@ -80,10 +88,12 @@ function App() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && hasMore && !isLoading) {
+          setPage(page + 1);
+          console.log(page);
           fetchPopularMovies(page + 1);
         }
       },
-      { root: null, rootMargin: "400px", threshold: 0 }
+      { root: null, rootMargin: "500px", threshold: 0 }
     );
     observer.observe(node);
     return () => observer.disconnect();
@@ -114,8 +124,8 @@ function App() {
             </ul>
           )}
         </section>
+        {hasMore && <div ref={sentinelRef} style={{ height: 1 }} />}
       </div>
-      {hasMore && <div ref={sentinelRef} style={{ height: 1 }} />}
     </main>
   );
 }
