@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 
-function MovieCard({ movie }) {
+function MovieCard({ movie, width }) {
   const {
     id,
     title,
@@ -11,7 +11,10 @@ function MovieCard({ movie }) {
     original_language,
   } = movie;
   return (
-    <li className="movie-card text-white transition-transform duration-150 ease-in hover:scale-105 ">
+    <li
+      className="movie-card text-white transition-transform duration-150 ease-in hover:scale-105 w-[300px] list-none"
+      style={{ width: width }}
+    >
       <Link to={`/details/${id}`}>
         <img
           src={

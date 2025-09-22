@@ -1,8 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { SimularMovies } from "../components/SimularMovies";
-import MovieCard from "../components/MovieCard";
+import { SimpleSlider } from "../components/SimpleSlider";
 const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const API_DATA = {
@@ -44,7 +43,7 @@ export const MovieDetails = () => {
   useEffect(() => {
     fetchMovie();
     fetchSimilarMovies();
-  }, []);
+  }, [movieId]);
 
   return (
     movie && (
@@ -66,7 +65,7 @@ export const MovieDetails = () => {
                 <span className="font-bold">Genres:</span>{" "}
               </p>
               {movie.genres.map(({ name }) => (
-                <li>{name}</li>
+                <li key={name}>{name}</li>
               ))}
             </ul>
             <p>
@@ -93,17 +92,16 @@ export const MovieDetails = () => {
           </div>
         </div>
         <ul></ul>
-        <div className="all-movies">
-          <h2 className="text-center mt-20">Simular movies</h2>
 
-          {similarMovies && (
-            <ul className="">
+        <h2 className="text-center mt-20">Simular movies</h2>
+        {similarMovies && (
+          <SimpleSlider movies={similarMovies} />
+          /* <ul className="">
               {similarMovies.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
-            </ul>
-          )}
-        </div>
+            </ul> */
+        )}
       </section>
     )
   );
