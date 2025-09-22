@@ -11,11 +11,8 @@ function MovieCard({ movie }) {
     original_language,
   } = movie;
   return (
-    <Link to={`/details/${id}`}>
-      <li
-        
-        className="movie-card text-white transition-transform duration-150 ease-in hover:scale-105 "
-      >
+    <li className="movie-card text-white transition-transform duration-150 ease-in hover:scale-105 ">
+      <Link to={`/details/${id}`}>
         <img
           src={
             poster_path
@@ -39,8 +36,8 @@ function MovieCard({ movie }) {
             </p>
           </div>
         </div>
-      </li>
-    </Link>
+      </Link>
+    </li>
   );
 }
 

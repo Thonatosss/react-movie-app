@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import { SimularMovies } from "../components/SimularMovies";
+import MovieCard from "../components/MovieCard";
 const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const API_DATA = {
@@ -13,20 +15,35 @@ const API_DATA = {
 export const MovieDetails = () => {
   const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
+  const [similarMovies, setSimilarMovies] = useState(null);
   const fetchMovie = async () => {
     try {
       const { data } = await axios.get(
         `${API_BASE_URL}/movie/${movieId}`,
         API_DATA
       );
-      
+
       setMovie(data);
     } catch (error) {
       console.log(error);
     }
   };
+  async function fetchSimilarMovies() {
+    try {
+      const { data } = await axios.get(
+        `${API_BASE_URL}/movie/${movieId}/similar`,
+        API_DATA
+      );
+      console.log(data);
+
+      setSimilarMovies(data.results);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   useEffect(() => {
     fetchMovie();
+    fetchSimilarMovies();
   }, []);
 
   return (
@@ -43,7 +60,7 @@ export const MovieDetails = () => {
             }
           ></img>
           <div className="flex flex-col gap-5 w-[45%]">
-            {movie.adult && <p>18+</p>}
+            {movie.adult && <p className="text-white">18+</p>}
             <ul className="flex gap-2">
               <p>
                 <span className="font-bold">Genres:</span>{" "}
@@ -57,7 +74,8 @@ export const MovieDetails = () => {
               {movie.release_date ? movie.release_date.split("-")[0] : "N/A"}
             </p>
             <p>
-              <span className="font-bold">Budget:</span> {movie.budget}$
+              <span className="font-bold">Budget:</span>{" "}
+              {movie.budget ? movie.budget + "$" : "N/A"}
             </p>
             <p>
               <span className="font-bold">Runtime:</span> {movie.runtime}{" "}
@@ -75,6 +93,17 @@ export const MovieDetails = () => {
           </div>
         </div>
         <ul></ul>
+        <div className="all-movies">
+          <h2 className="text-center mt-20">Simular movies</h2>
+
+          {similarMovies && (
+            <ul className="">
+              {similarMovies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
+              ))}
+            </ul>
+          )}
+        </div>
       </section>
     )
   );

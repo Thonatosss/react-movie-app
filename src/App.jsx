@@ -27,7 +27,6 @@ function App() {
     setIsLoading(true);
     setError("");
     const endpoint = `${API_BASE_URL}/discover/movie?sort_by=popularity.desc&page=${pageNum}`;
-    // const endpoint = `${API_BASE_URL}/movie/popular?page=${pageNum}`;
 
     try {
       const { data } = await axios.get(endpoint, API_DATA);
@@ -51,7 +50,6 @@ function App() {
     }
   };
   const handleSearch = async () => {
-    if (!search.trim()) return;
     setIsLoading(true);
     setError("");
     let endpoint = `${API_BASE_URL}/search/movie?query=${search}`;
@@ -73,7 +71,8 @@ function App() {
   }, []);
   useEffect(() => {
     if (!search) {
-      fetchPopularMovies();
+      setMovies([]);
+      fetchPopularMovies(1);
       return;
     }
 
@@ -113,7 +112,9 @@ function App() {
           <h2 className="mt-[40px]">All Movies</h2>
 
           {isLoading ? (
-            <HashLoader color="red" size={100} />
+            <div className="w-full flex justify-center items-center">
+              <HashLoader color="red" size={100} />
+            </div>
           ) : error ? (
             <p className="text-red-700">{error}</p>
           ) : (

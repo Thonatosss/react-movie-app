@@ -8,6 +8,7 @@ import { MovieDetails } from "./pages/MovieDetails.jsx";
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/details/:movieId", element: <MovieDetails /> },
+  { path: "/:movieId/simular", element: <MovieDetails /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
 createRoot(document.getElementById("root")).render(
